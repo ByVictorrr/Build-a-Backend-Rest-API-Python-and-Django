@@ -2,10 +2,13 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
 
 from profiles_api import serializers
+from profiles_api import models
+from profiles_api import permissions
 # Create your views here.
-
 
 
 
@@ -53,4 +56,64 @@ class HelloApiView(APIView):
         return Response({"method": "DELETE"})
 
 
+class HelloViewSet(viewsets.ViewSet):
+    """Test API ViewSet"""
+    serializer_class = serializers.HelloSerializer
+
+
+    def list(self, request):
+        """return a hello message"""
+        a_viewset = [
+                "Uses actions (list, creat, retrive, update, partial_update)",
+                "Automatically maps to URLS using routers",
+                "Provides more functionallity with less code",
+                ]
+        return Response({"message": "Hello!", "a_viewset": a_viewset })
+
+    def create(self, request):
+        """Create a new hello message"""
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            name = serializer.validated_data.get("name")
+            message = "hello {}".format(name)
+            return Response({"message": message})
+        else:
+            return Response(
+                    serializer.errors,
+                    status=status.HTTP_400_BAD_REQUEST
+                    )
+
+
+    # 1 woudl be the pk
+    # http://localhost:8000/api/hello-viewset/1/
+    def retrieve(self, request, pk=None):
+         """Handle getting an object by its id"""
+         return Response({"http_method":"GET"})
+
+    # type some in that name field while being on pk=1
+    def update(self, request, pk=None):
+        """Handle updating an object"""
+        return Response({"http_method":"PUT"})
+
+
+    # click on raw data and press patch
+    def partial_update(self,request, pk=None):
+        """Handle updating part of an object"""
+        return Response({"http_method":"PATCH"})
+    # can delete the object with pk=1 above
+
+    def destroy(self, request, pk=None):
+        """Handles removing an object"""
+        return Response({"http_method":"DELETE"})
+
+
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """Handle creating and updating profiles"""
+    serializer_class = serializers.UserProfileSerializer
+    queryset = models.UserProfile.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.UpdateOwnProfile,)
 
