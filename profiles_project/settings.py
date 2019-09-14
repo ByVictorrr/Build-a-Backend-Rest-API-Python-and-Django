@@ -124,3 +124,4 @@ STATIC_URL = '/static/'
 
 # look at app.model
 AUTH_USER_MODEL = 'profiles_api.UserProfile'
+

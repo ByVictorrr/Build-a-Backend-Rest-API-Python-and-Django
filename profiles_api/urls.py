@@ -3,8 +3,10 @@ from rest_framework.routers import DefaultRouter
 from profiles_api import views
 
 router= DefaultRouter()
+# for viewset
 router.register('hello-viewset', views.HelloViewSet, base_name='hello-viewset')
 router.register('profile',views.UserProfileViewSet) # not base name because using queryset
+router.register('feed',views.UserProfilesFeedViewSet)
 
 urlpatterns = [
         path('hello-view/', views.HelloApiView.as_view()),
